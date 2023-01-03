@@ -10,7 +10,7 @@ public class TestWindow : EditorWindow
 {
     public static int _lableScale = 15;
     public static float _lableSpace = 20;
-    private static float _scale, _defaultScale = 1;
+    private static float _scale = 1, _defaultScale = 1;
     private static float _minScale = 0.1f;
     private static float _maxScale = 1f;
     public static Color _eyes_Color;
@@ -24,6 +24,8 @@ public class TestWindow : EditorWindow
     public static Material _commonA_Material;
     public static Material _commonB_Material;
     private GUIStyle _defaultStyle;
+    private GUIStyle _grayStyle_1;
+    private GUIStyle _grayStyle_2;
     private GUIStyle _materialsStyle;
     private GUIStyle _scaleStyle;
     private GUIStyle _alignmentStyle;
@@ -45,6 +47,20 @@ public class TestWindow : EditorWindow
         _defaultStyle.fontSize = 12;
         _defaultStyle.normal.textColor = Color.white;
         _defaultStyle.richText = false;
+        
+        // Gray 1. 
+        _grayStyle_1 = new GUIStyle();
+        _grayStyle_1.fontSize = 12;
+        _grayStyle_1.normal.textColor = Color.red * 0.85f;
+        _grayStyle_1.richText = false;
+        _grayStyle_1.alignment = TextAnchor.MiddleCenter;
+        
+        // Gray 2.
+        _grayStyle_2 = new GUIStyle();
+        _grayStyle_2.fontSize = _grayStyle_1.fontSize;
+        _grayStyle_2.normal.textColor = _grayStyle_1.normal.textColor;
+        _grayStyle_2.richText = _grayStyle_1.richText;
+        _grayStyle_2.alignment = _grayStyle_1.alignment;
 
         // Material.
         _materialsStyle = new GUIStyle();
@@ -73,7 +89,6 @@ public class TestWindow : EditorWindow
         _scenesStyle.normal.textColor = Color.magenta;
         _scenesStyle.richText = true;
         _scenesStyle.alignment = TextAnchor.MiddleCenter;
-
     }
 
     private void OnGUI()
@@ -81,125 +96,131 @@ public class TestWindow : EditorWindow
         // Materials.
         GUILayout.Space(_lableSpace);
         GUILayout.Label("<b>Materials</b>", _materialsStyle);
-        GUILayout.Label("Dog materials", _defaultStyle);
+        GUILayout.Label("  Dog materials", _defaultStyle);
+        EditorGUILayout.Separator();
         GUILayout.BeginHorizontal();
-        GUILayout.Label("Eyes");
-        GUILayout.Label("Body A");
-        GUILayout.Label("Body B");
+            GUILayout.Label("Eyes", _grayStyle_1);
+            GUILayout.Label("Body A", _grayStyle_1);
+            GUILayout.Label("Body B", _grayStyle_1);
         GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal();
-        _eyes_Material = EditorGUILayout.ObjectField(_eyes_Material, typeof(Material), true) as Material;
-        _bodyA_Material = EditorGUILayout.ObjectField(_bodyA_Material, typeof(Material), true) as Material;
-        _bodyB_Material = EditorGUILayout.ObjectField(_bodyB_Material, typeof(Material), true) as Material;
+            _eyes_Material = EditorGUILayout.ObjectField(_eyes_Material, typeof(Material), true) as Material;
+            _bodyA_Material = EditorGUILayout.ObjectField(_bodyA_Material, typeof(Material), true) as Material;
+            _bodyB_Material = EditorGUILayout.ObjectField(_bodyB_Material, typeof(Material), true) as Material;
         GUILayout.EndHorizontal();
         if (!_eyes_Material || !_bodyA_Material || !_bodyB_Material)
         {
-            EditorGUILayout.HelpBox("Assign materials", MessageType.Warning);
+            EditorGUILayout.HelpBox("Assign materials", MessageType.Error);
+            _grayStyle_1.normal.textColor = Color.red * 0.85f;
         }
         else
         {
             GUILayout.BeginHorizontal();
-            EditorGUI.BeginChangeCheck();
-            Undo.RecordObject(_eyes_Material, "ChangeColor");
-            _eyes_Color = _eyes_Material.color;
-            _eyes_Color = EditorGUILayout.ColorField(_eyes_Color);
-            if (EditorGUI.EndChangeCheck())
-            {
-                SetColor(_eyes_Material, _eyes_Color);
-            }
-            EditorGUI.BeginChangeCheck();
-            Undo.RecordObject(_bodyA_Material, "ChangeColor");
-            _bodyA_Color = _bodyA_Material.color;
-            _bodyA_Color = EditorGUILayout.ColorField(_bodyA_Color);
-            if (EditorGUI.EndChangeCheck())
-            {
-                SetColor(_bodyA_Material, _bodyA_Color);
-            }
-            EditorGUI.BeginChangeCheck();
-            Undo.RecordObject(_bodyB_Material, "ChangeColor");
-            _bodyB_Color = _bodyB_Material.color;
-            _bodyB_Color = EditorGUILayout.ColorField(_bodyB_Color);
-            if (EditorGUI.EndChangeCheck())
-            {
-                SetColor(_bodyB_Material, _bodyB_Color);
-            }
-            GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Random"))
-            {
+                EditorGUI.BeginChangeCheck();
+                _grayStyle_1.normal.textColor = Color.gray;
                 Undo.RecordObject(_eyes_Material, "ChangeColor");
-                SetRandomColor(_eyes_Material, ref _eyes_Color);
-            }
-            if (GUILayout.Button("Random"))
-            {
+                _eyes_Color = _eyes_Material.color;
+                _eyes_Color = EditorGUILayout.ColorField(_eyes_Color);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    SetColor(_eyes_Material, _eyes_Color);
+                }
+                EditorGUI.BeginChangeCheck();
                 Undo.RecordObject(_bodyA_Material, "ChangeColor");
-                SetRandomColor(_bodyA_Material, ref _bodyA_Color);
-            }
-            if (GUILayout.Button("Random"))
-            {
+                _bodyA_Color = _bodyA_Material.color;
+                _bodyA_Color = EditorGUILayout.ColorField(_bodyA_Color);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    SetColor(_bodyA_Material, _bodyA_Color);
+                }
+                EditorGUI.BeginChangeCheck();
                 Undo.RecordObject(_bodyB_Material, "ChangeColor");
-                SetRandomColor(_bodyB_Material, ref _bodyB_Color);
-            }
+                _bodyB_Color = _bodyB_Material.color;
+                _bodyB_Color = EditorGUILayout.ColorField(_bodyB_Color);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    SetColor(_bodyB_Material, _bodyB_Color);
+                }
+                GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Button("Random", GUILayout.MinWidth(100), GUILayout.MinHeight(30)))
+                {
+                    Undo.RecordObject(_eyes_Material, "ChangeColor");
+                    SetRandomColor(_eyes_Material, ref _eyes_Color);
+                }
+                if (GUILayout.Button("Random", GUILayout.MinWidth(100), GUILayout.MinHeight(30)))
+                {
+                    Undo.RecordObject(_bodyA_Material, "ChangeColor");
+                    SetRandomColor(_bodyA_Material, ref _bodyA_Color);
+                }
+                if (GUILayout.Button("Random", GUILayout.MinWidth(100), GUILayout.MinHeight(30)))
+                {
+                    Undo.RecordObject(_bodyB_Material, "ChangeColor");
+                    SetRandomColor(_bodyB_Material, ref _bodyB_Color);
+                }
             GUILayout.EndHorizontal();
         }
 
         GUILayout.Space(_lableSpace);
-        GUILayout.Label("Common materials", _defaultStyle);
+        GUILayout.Label("  Common materials", _defaultStyle);
+        EditorGUILayout.Separator();
         GUILayout.BeginHorizontal();
-        GUILayout.Label("Common A");
-        GUILayout.Label("Common B");
+            GUILayout.Label("Common A", _grayStyle_2);
+            GUILayout.Label("Common B", _grayStyle_2);
         GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal();
-        _commonA_Material = EditorGUILayout.ObjectField(_commonA_Material, typeof(Material), true) as Material;
-        _commonB_Material = EditorGUILayout.ObjectField(_commonB_Material, typeof(Material), true) as Material;
+            _commonA_Material = EditorGUILayout.ObjectField(_commonA_Material, typeof(Material), true) as Material;
+            _commonB_Material = EditorGUILayout.ObjectField(_commonB_Material, typeof(Material), true) as Material;
         GUILayout.EndHorizontal();
         if (!_commonA_Material || !_commonB_Material)
         {
-            EditorGUILayout.HelpBox("Assign materials", MessageType.Warning);
+            EditorGUILayout.HelpBox("Assign materials", MessageType.Error);
+            _grayStyle_2.normal.textColor = Color.red * 0.85f;
         }
         else
         {
             GUILayout.BeginHorizontal();
-            EditorGUI.BeginChangeCheck();
-            Undo.RecordObject(_commonA_Material, "ChangeColor");
-            _commonA_Color = _commonA_Material.color;
-            _commonA_Color = EditorGUILayout.ColorField(_commonA_Color);
-            if (EditorGUI.EndChangeCheck())
-            {
-                SetColor(_commonA_Material, _commonA_Color);
-            }
-            EditorGUI.BeginChangeCheck();
-            Undo.RecordObject(_commonB_Material, "ChangeColor");
-            _commonB_Color = _commonB_Material.color;
-            _commonB_Color = EditorGUILayout.ColorField(_commonB_Color);
-            if (EditorGUI.EndChangeCheck())
-            {
-                SetColor(_commonB_Material, _commonB_Color);
-            }
+                EditorGUI.BeginChangeCheck();
+                _grayStyle_2.normal.textColor = Color.gray;
+                Undo.RecordObject(_commonA_Material, "ChangeColor");
+                _commonA_Color = _commonA_Material.color;
+                _commonA_Color = EditorGUILayout.ColorField(_commonA_Color);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    SetColor(_commonA_Material, _commonA_Color);
+                }
+                EditorGUI.BeginChangeCheck();
+                Undo.RecordObject(_commonB_Material, "ChangeColor");
+                _commonB_Color = _commonB_Material.color;
+                _commonB_Color = EditorGUILayout.ColorField(_commonB_Color);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    SetColor(_commonB_Material, _commonB_Color);
+                }
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Random"))
-            {
-                Undo.RecordObject(_commonA_Material, "ChangeColor");
-                SetRandomColor(_commonA_Material, ref _commonA_Color);
-            }
-            if (GUILayout.Button("Random"))
-            {
-                Undo.RecordObject(_commonB_Material, "ChangeColor");
-                SetRandomColor(_commonB_Material, ref _commonB_Color);
-            }
+                if (GUILayout.Button("Random", GUILayout.MinWidth(100), GUILayout.MinHeight(30)))
+                {
+                    Undo.RecordObject(_commonA_Material, "ChangeColor");
+                    SetRandomColor(_commonA_Material, ref _commonA_Color);
+                }
+                if (GUILayout.Button("Random", GUILayout.MinWidth(100), GUILayout.MinHeight(30)))
+                {
+                    Undo.RecordObject(_commonB_Material, "ChangeColor");
+                    SetRandomColor(_commonB_Material, ref _commonB_Color);
+                }
             GUILayout.EndHorizontal();
 
-            GUILayout.Space(_lableSpace);
+            EditorGUILayout.Separator();
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Set Common A", GUILayout.MinWidth(100), GUILayout.MinHeight(30)))
-            {
-                SetMaterial(_commonA_Material);
-            }
-            if (GUILayout.Button("Set Common B", GUILayout.MinWidth(100), GUILayout.MinHeight(30)))
-            {
-                SetMaterial(_commonB_Material);
-            }
+                if (GUILayout.Button("Set Common A", GUILayout.MinWidth(100), GUILayout.MinHeight(30)))
+                {
+                    SetMaterial(_commonA_Material);
+                }
+                if (GUILayout.Button("Set Common B", GUILayout.MinWidth(100), GUILayout.MinHeight(30)))
+                {
+                    SetMaterial(_commonB_Material);
+                }
             GUILayout.EndHorizontal();
             if (GUILayout.Button("Set Random", GUILayout.MinWidth(200), GUILayout.MinHeight(50)))
             {
@@ -230,18 +251,22 @@ public class TestWindow : EditorWindow
         // Alignment.
         GUILayout.Space(_lableSpace);
         GUILayout.Label("<b>Alignment</b>", _alignmentStyle);
-        if (GUILayout.Button("Scatter", GUILayout.MinHeight(30)))
-        {
-            Scatter();
-        }
-        if (GUILayout.Button("Align", GUILayout.MinHeight(30)))
-        {
-            Align();
-        }
-        if (GUILayout.Button("DefaultPosition", GUILayout.MinHeight(30)))
-        {
-            SetDefaultPosition();
-        }
+        EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginVertical();
+                if (GUILayout.Button("Scatter", GUILayout.MinHeight(30)))
+                {
+                    Scatter();
+                }
+                if (GUILayout.Button("Align", GUILayout.MinHeight(30)))
+                {
+                    Align();
+                }
+            EditorGUILayout.EndVertical();
+            if (GUILayout.Button("DefaultPosition", GUILayout.MinHeight(62)))
+            {
+                SetDefaultPosition();
+            }
+        EditorGUILayout.EndHorizontal();
 
         // Scenes
         GUILayout.Space(_lableSpace);
